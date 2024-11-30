@@ -527,25 +527,25 @@ const Admin: React.FC = () => {
             />
             {modalType === 'MULTI_ANSWERS' && (
               <>
-                {currentQuestion.choices.map((choice, index) => (
-                  <Box key={index} display="flex" alignItems="center" gap={2} mb={2}>
+                {currentQuestion.choices.map((choice: string, idx: number) => (
+                  <Box key={idx} display="flex" alignItems="center" gap={2} mb={2}>
                     <TextField
                       fullWidth
                       value={choice}
                       onChange={(e) =>
                         setCurrentQuestion((prev) => {
                           const updatedChoices = [...prev.choices];
-                          updatedChoices[index] = e.target.value;
+                          updatedChoices[idx] = e.target.value;
                           return { ...prev, choices: updatedChoices };
                         })
                       }
-                      placeholder={`Choice ${index + 1}`}
+                      placeholder={`Choice ${idx + 1}`}
                     />
                     <Button
                       onClick={() =>
                         setCurrentQuestion((prev) => ({
                           ...prev,
-                          choices: prev.choices.filter((_, i) => i !== index),
+                          choices: prev.choices.filter((_, i) => i !== idx),
                         }))
                       }
                     >
@@ -657,7 +657,7 @@ const Admin: React.FC = () => {
                       Choices:
                     </Typography>
                     <ul>
-                      {q.choices.map((choice, idx) => (
+                      {q.choices.map((choice: string, idx: number) => (
                         <li key={idx}>
                           <Typography variant="body2">{choice}</Typography>
                         </li>

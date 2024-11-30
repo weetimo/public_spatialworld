@@ -29,6 +29,7 @@ export const exportToCSV = (data: any[]) => {
   // Create blob and download
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
   const link = document.createElement('a')
+  const link = document.createElement('a')
   const url = URL.createObjectURL(blob)
   link.setAttribute('href', url)
   link.setAttribute('download', 'participants_data.csv')
@@ -38,20 +39,37 @@ export const exportToCSV = (data: any[]) => {
   document.body.removeChild(link)
 }
 
-export const demographicsData = (users: any[]) => {
+interface User {
+  demographic?: {
+    gender?: string;
+    ageGroup?: string;
+  };
+}
+
+export const demographicsData = (users: User[]) => {
   const result = ageGroups.map(ageGroup => ({
     age: ageGroup,
     male: 0,
     female: 0
   }))
 
-  users.forEach(({ ageGroup, gender }) => {
-    const demographic = result.find(item => item.age === ageGroup)
+  users.forEach(user => {
+    const demographic = user.demographic
+    if (demographic) {
+      const ageGroup = demographic.ageGroup
+      const gender = demographic.gender
 
-    if (gender === 'MALE') {
-      demographic.male += 1
-    } else if (gender === 'FEMALE') {
-      demographic.female += 1
+      if (ageGroup && gender) {
+        const demographicResult = result.find(item => item.age === ageGroup)
+
+        if (demographicResult) {
+          if (gender === 'MALE') {
+            demographicResult.male += 1
+          } else if (gender === 'FEMALE') {
+            demographicResult.female += 1
+          }
+        }
+      }
     }
   })
 
@@ -118,9 +136,9 @@ export const regionData = (users: any[]) => {
 
 interface Generation {
   prompt: string;
+  originalPrompt?: string;
 }
 
-// Updated interface to match ReactWordcloud expectations
 interface WordCloudData {
   text: string;
   value: number;
@@ -134,27 +152,25 @@ export const word_cloud = (generations: Generation[]): WordCloudData[] => {
     'have', 'had', 'what', 'when', 'where', 'who', 'which', 'why', 'how'
   ]);
 
-  const wordCount: { [key: string]: number } = {};
+  const words: { [key: string]: number } = {};
 
-  generations.forEach(generation => {
-    const words = generation.originalPrompt
-      .toLowerCase()
-      .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, '')
-      .split(/\s+/);
+  generations.forEach((gen) => {
+    const prompt = gen.prompt || '';
+    const words_array = prompt.toLowerCase().split(' ');
 
-    words.forEach(word => {
+    words_array.forEach(word => {
       if (word && !stopWords.has(word)) {
-        if (wordCount[word] === undefined) {
-          wordCount[word] = 1;
+        if (words[word] === undefined) {
+          words[word] = 1;
         } else {
-          wordCount[word] += 1;
+          words[word] += 1;
         }
       }
     });
   });
 
   // Transform to ReactWordcloud format
-  const wordCloudData: WordCloudData[] = Object.entries(wordCount)
+  const wordCloudData: WordCloudData[] = Object.entries(words)
     .map(([text, value]) => ({ text, value }))
     .sort((a, b) => b.value - a.value)
     .slice(0, 20);

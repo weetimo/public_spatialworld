@@ -35,12 +35,17 @@ import ReactWordcloud from 'react-d3-cloud'
 import { exportToCSV, demographicsData, regionData, word_cloud } from './utils'
 import { useDatabase } from '../../../hooks'
 
+interface Generation {
+  prompt: string;
+  originalPrompt?: string;
+}
+
 const HomeContent: React.FC<{ engagementId: string }> = ({ engagementId }) => {
   const { readData } = useDatabase()
 
   const [engagementData, setEngagementData] = useState<any>(null)
   const [participants, setParticipants] = useState<any[]>([])
-  const [generations, setGenerations] = useState<any[]>([])
+  const [generations, setGenerations] = useState<Generation[]>([])
 
   const [wordCloudData, setWordCloudData] = useState<
     Array<{ text: string; value: number }>
