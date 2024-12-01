@@ -20,7 +20,19 @@ import {
 import { useDatabase } from '../../../hooks'
 import { getQuestionsAndAnswers, stringToPastelColor } from './utils'
 
-const ImageView: React.FC<{ imageData: any, onBack: any }> = ({ imageData, onBack }) => {
+interface UserData {
+  name: string;
+  ageGroup: string;
+  postalCode: string;
+  email: string;
+}
+
+interface ImageViewProps {
+  imageData: any;
+  onBack: any;
+}
+
+const ImageView: React.FC<ImageViewProps> = ({ imageData, onBack }) => {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
@@ -28,7 +40,7 @@ const ImageView: React.FC<{ imageData: any, onBack: any }> = ({ imageData, onBac
 
   const { readData } = useDatabase()
 
-  const [user, setUser] = useState<any[]>([])
+  const [userData, setUserData] = useState<UserData | null>(null)
   const [questionsAndAnswers, setQuestionsAndAnswers] = useState<any[]>([])
 
   const stableReadData = useCallback(readData, [])
@@ -37,7 +49,7 @@ const ImageView: React.FC<{ imageData: any, onBack: any }> = ({ imageData, onBac
     const fetchData = async () => {
       try {
         const user = await readData(`users/${imageData.userId}`)
-        setUser(user)
+        setUserData(user)
 
         const questions = await getQuestionsAndAnswers(
           imageData.engagementId,
@@ -176,7 +188,7 @@ const ImageView: React.FC<{ imageData: any, onBack: any }> = ({ imageData, onBac
               </Typography>
             </Box>
             <Grid container spacing={{ xs: 1, sm: 2 }}>
-              {Object.entries({ name: user.name, ageGroup: user.ageGroup, postalCode: user.postalCode, email: user.email }).map(([key, value]) => (
+              {userData && Object.entries(userData).map(([key, value]) => (
                 <Grid item xs={12} key={key}>
                   <Typography
                     variant='caption'

@@ -1,6 +1,16 @@
 import { ageGroups } from '../../../constants'
 
-export const exportToCSV = (data: any[]) => {
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  gender: 'Male' | 'Female' | 'Other';
+  ageGroup: string;
+  postalCode: string;
+  role: 'user' | 'admin';
+}
+
+export const exportToCSV = (data: User[]) => {
   // Define headers for all fields
   const headers = [
     'ID',
@@ -38,14 +48,14 @@ export const exportToCSV = (data: any[]) => {
   document.body.removeChild(link)
 }
 
-interface User {
+interface UserDemographic {
   demographic?: {
     gender?: string;
     ageGroup?: string;
   };
 }
 
-export const demographicsData = (users: User[]) => {
+export const demographicsData = (users: UserDemographic[]) => {
   const result = ageGroups.map(ageGroup => ({
     age: ageGroup,
     male: 0,

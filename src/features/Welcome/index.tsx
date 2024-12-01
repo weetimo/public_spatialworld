@@ -60,7 +60,15 @@ const Welcome: React.FC = () => {
     <Box sx={styles.container}>
       {/* Step Image */}
       <Box sx={styles.imageContainer}>
-        <img src={steps[currentStep].image} alt={`Step ${currentStep + 1}`} style={styles.image} />
+        <Box
+          component="img"
+          src={steps[currentStep].image}
+          sx={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover' as const
+          }}
+        />
       </Box>
 
       {/* Content Area */}
@@ -128,11 +136,6 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
   },
   content: {
     padding: '2rem'
