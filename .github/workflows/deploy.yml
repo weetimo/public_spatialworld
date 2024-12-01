@@ -6,7 +6,7 @@ on:
       - main
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -22,6 +22,9 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
+        with:
+          submodules: false  # Don't fetch submodules
+          clean: true       # Clean any existing files
 
       - name: Setup Node
         uses: actions/setup-node@v3
@@ -33,8 +36,8 @@ jobs:
 
       - name: Build project
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} # OpenAI API key
-          GETIMG_API_KEY: ${{ secrets.GETIMG_API_KEY }} # GetImg API key
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GETIMG_API_KEY: ${{ secrets.GETIMG_API_KEY }}
         run: npm run build
 
       - name: Upload production-ready build files
