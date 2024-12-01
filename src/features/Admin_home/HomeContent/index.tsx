@@ -30,7 +30,7 @@ import {
   Pie,
   Cell
 } from 'recharts'
-import { ReactWordCloud } from 'react-wordcloud'
+import ReactWordcloud from 'react-d3-cloud'
 import { exportToCSV, demographicsData, regionData, word_cloud, Generation } from './utils'
 import { useDatabase } from '../../../hooks'
 
@@ -876,19 +876,10 @@ const HomeContent: React.FC<{ engagementId: string }> = ({ engagementId }) => {
             p: 2
           }}
         >
-          <ReactWordCloud
+          <ReactWordcloud
             data={wordCloudData}
-            // fontSize={(word) => 10 + Math.pow(word.value, 3) * 1.5}
             fontSize={(word) => 10 + Math.pow(word.value, 2) * 1.4}
-            font='impact'
             rotate={0}
-            padding={5}
-            width={1200}
-            height={350}
-            spiral='archimedean'
-            fill={(_word: any, index: number) =>
-              ['#0d47a1', '#2e7d32', '#ef4444', '#f97316'][index % 4]
-            }
           />
         </Box>
       </Box>
