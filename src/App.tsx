@@ -1,4 +1,3 @@
-import React, { FC } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { FeedDetail, ImageFeed, ImageWorkshop, MeetTheCharacters, UserParticulars, UserPreferences, Welcome, Admin, Admin_home } from './features'
 

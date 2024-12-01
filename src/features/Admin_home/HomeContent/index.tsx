@@ -6,7 +6,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
   TableRow,
   Paper,
@@ -31,22 +30,28 @@ import {
   Pie,
   Cell
 } from 'recharts'
-import ReactWordcloud from 'react-d3-cloud'
-import { exportToCSV, demographicsData, regionData, word_cloud } from './utils'
+import { ReactWordCloud } from 'react-wordcloud'
+import { exportToCSV, demographicsData, regionData, word_cloud, Generation } from './utils'
 import { useDatabase } from '../../../hooks'
 
-interface Generation {
-  prompt: string;
-  originalPrompt?: string;
+interface GenerationsData {
+  [key: string]: Generation;
+}
+
+interface User {
+  id?: string;
+  preferences?: {
+    questionnaireId?: string;
+    [key: string]: any;
+  };
+  [key: string]: any;
 }
 
 const HomeContent: React.FC<{ engagementId: string }> = ({ engagementId }) => {
   const { readData } = useDatabase()
 
   const [engagementData, setEngagementData] = useState<any>(null)
-  const [participants, setParticipants] = useState<any[]>([])
-  const [generations, setGenerations] = useState<Generation[]>([])
-
+  const [participants, setParticipants] = useState<User[]>([])
   const [wordCloudData, setWordCloudData] = useState<
     Array<{ text: string; value: number }>
   >([])
@@ -70,9 +75,9 @@ const HomeContent: React.FC<{ engagementId: string }> = ({ engagementId }) => {
         const data = await readData('users')
         if (data) {
           const usersArray = Object.entries(data)
-            .map(([id, user]) => ({ id, ...user }))
+            .map(([id, user]) => ({ id, ...(user as User) }))
             .filter(
-              (user) => user.preferences?.questionnaireId === engagementId
+              (user: User) => user.preferences?.questionnaireId === engagementId
             )
           setParticipants(usersArray)
         }
@@ -96,9 +101,8 @@ const HomeContent: React.FC<{ engagementId: string }> = ({ engagementId }) => {
 
     const fetchGenerations = async () => {
       try {
-        const data = await readData(`generations/${'5920582525'}`)
-        const generationsArray = Object.values(data)
-        setGenerations(generationsArray)
+        const data = await readData(`generations/${'5920582525'}`) as GenerationsData
+        const generationsArray = Object.values(data) as Generation[]
         console.log('generations:', generationsArray)
 
         const cloud = word_cloud(generationsArray)
@@ -452,7 +456,7 @@ const HomeContent: React.FC<{ engagementId: string }> = ({ engagementId }) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {participants.map((participant) => (
+                {participants.map((participant: User) => (
                   <TableRow key={participant.id}>
                     <TableCell>{participant.name}</TableCell>
                     <TableCell>{participant.email}</TableCell>
@@ -872,7 +876,7 @@ const HomeContent: React.FC<{ engagementId: string }> = ({ engagementId }) => {
             p: 2
           }}
         >
-          <ReactWordcloud
+          <ReactWordCloud
             data={wordCloudData}
             // fontSize={(word) => 10 + Math.pow(word.value, 3) * 1.5}
             fontSize={(word) => 10 + Math.pow(word.value, 2) * 1.4}

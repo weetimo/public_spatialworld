@@ -6,6 +6,13 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import { v4 as uuid } from 'uuid'
 import { useDatabase, useCloudinary } from '../../hooks'
 
+interface Question {
+  id: string;
+  type: 'MULTI_ANSWERS' | 'FREE_RESPONSE';
+  question: string;
+  choices: string[];
+}
+
 const Admin: React.FC = () => {
   const navigate = useNavigate()
   const { createData, readData } = useDatabase()
@@ -26,9 +33,9 @@ const Admin: React.FC = () => {
   const [showQuestionsScreen, setShowQuestionsScreen] = useState(false)
   const [showRestartDialog, setShowRestartDialog] = useState(false)
 
-  const [questions, setQuestions] = useState<any[]>([]);
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [modalType, setModalType] = useState<'MULTI_ANSWERS' | 'FREE_RESPONSE' | null>(null);
-  const [currentQuestion, setCurrentQuestion] = useState<{ question: string; choices: string[] }>({ question: '', choices: [] });
+  const [currentQuestion, setCurrentQuestion] = useState<Question>({ id: '', type: 'MULTI_ANSWERS', question: '', choices: [] });
   const [questionModalOpen, setQuestionModalOpen] = useState(false);
 
   const stableReadData = useCallback(readData, [])
@@ -144,7 +151,7 @@ const Admin: React.FC = () => {
         },
       ])
     }
-    setCurrentQuestion({ question: '', choices: [] })
+    setCurrentQuestion({ id: '', type: 'MULTI_ANSWERS', question: '', choices: [] })
     setQuestionModalOpen(false)
   }
 
@@ -545,7 +552,7 @@ const Admin: React.FC = () => {
                       onClick={() =>
                         setCurrentQuestion((prev) => ({
                           ...prev,
-                          choices: prev.choices.filter((_, i) => i !== idx),
+                          choices: prev.choices.filter((_, i: number) => i !== idx),
                         }))
                       }
                     >
@@ -632,7 +639,7 @@ const Admin: React.FC = () => {
           </Box>
 
           <Box mt={4}>
-            {questions.map((q, index) => (
+            {questions.map((q, index: number) => (
               <Paper
                 key={index}
                 sx={{
@@ -657,7 +664,7 @@ const Admin: React.FC = () => {
                       Choices:
                     </Typography>
                     <ul>
-                      {q.choices.map((choice: string, idx: number) => (
+                      {(q as Question).choices.map((choice: string, idx: number) => (
                         <li key={idx}>
                           <Typography variant="body2">{choice}</Typography>
                         </li>
@@ -669,7 +676,7 @@ const Admin: React.FC = () => {
                   variant="contained"
                   color="error"
                   onClick={() =>
-                    setQuestions((prev) => prev.filter((_, i) => i !== index))
+                    setQuestions((prev) => prev.filter((_, i: number) => i !== index))
                   }
                   sx={{
                     mt: 2,

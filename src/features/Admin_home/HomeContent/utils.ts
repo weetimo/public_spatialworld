@@ -29,7 +29,6 @@ export const exportToCSV = (data: any[]) => {
   // Create blob and download
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
   const link = document.createElement('a')
-  const link = document.createElement('a')
   const url = URL.createObjectURL(blob)
   link.setAttribute('href', url)
   link.setAttribute('download', 'participants_data.csv')
@@ -54,26 +53,24 @@ export const demographicsData = (users: User[]) => {
   }))
 
   users.forEach(user => {
-    const demographic = user.demographic
-    if (demographic) {
-      const ageGroup = demographic.ageGroup
-      const gender = demographic.gender
+    const demographic = user.demographic;
+    if (!demographic?.ageGroup || !demographic?.gender) {
+      return;
+    }
 
-      if (ageGroup && gender) {
-        const demographicResult = result.find(item => item.age === ageGroup)
+    const { ageGroup, gender } = demographic;
+    const demographicResult = result.find(item => item.age === ageGroup);
 
-        if (demographicResult) {
-          if (gender === 'MALE') {
-            demographicResult.male += 1
-          } else if (gender === 'FEMALE') {
-            demographicResult.female += 1
-          }
-        }
+    if (demographicResult) {
+      if (gender === 'MALE') {
+        demographicResult.male += 1;
+      } else if (gender === 'FEMALE') {
+        demographicResult.female += 1;
       }
     }
-  })
+  });
 
-  return result
+  return result;
 }
 
 export const regionData = (users: any[]) => {
@@ -134,12 +131,12 @@ export const regionData = (users: any[]) => {
   }))
 }
 
-interface Generation {
+export interface Generation {
   prompt: string;
   originalPrompt?: string;
 }
 
-interface WordCloudData {
+export interface WordCloudData {
   text: string;
   value: number;
 }
@@ -158,7 +155,7 @@ export const word_cloud = (generations: Generation[]): WordCloudData[] => {
     const prompt = gen.prompt || '';
     const words_array = prompt.toLowerCase().split(' ');
 
-    words_array.forEach(word => {
+    words_array.forEach((word: string) => {
       if (word && !stopWords.has(word)) {
         if (words[word] === undefined) {
           words[word] = 1;
@@ -176,14 +173,14 @@ export const word_cloud = (generations: Generation[]): WordCloudData[] => {
     .slice(0, 20);
 
   // Find min and max values for normalization
-  const maxValue = Math.max(...wordCloudData.map(word => word.value));
-  const minValue = Math.min(...wordCloudData.map(word => word.value));
+  const maxValue = Math.max(...wordCloudData.map((item: WordCloudData) => item.value));
+  const minValue = Math.min(...wordCloudData.map((item: WordCloudData) => item.value));
 
   // Normalize the values to 1-10
-  return wordCloudData.map(word => ({
-    text: word.text,
+  return wordCloudData.map((item: WordCloudData) => ({
+    text: item.text,
     value: minValue === maxValue
       ? 5  // If all values are the same, set to middle of range
-      : 1 + ((word.value - minValue) * (10 - 1)) / (maxValue - minValue)
+      : 1 + ((item.value - minValue) * (10 - 1)) / (maxValue - minValue)
   }));
 };
